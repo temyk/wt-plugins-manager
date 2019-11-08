@@ -78,6 +78,9 @@ class WTBulkPlugins {
 	private function define_admin() {
 
 		add_action('admin_enqueue_scripts', array($this, 'admin_enqueue_scripts'), 10, 1);
+		add_filter( 'bulk_actions-plugins', [ $this, 'register_bulk_action'] );
+		add_filter( 'handle_bulk_actions-plugins', [ $this, 'bulk_action_handler'], 10, 3 );
+		add_action( 'admin_notices', [ $this, 'wtbp_bulk_action_admin_notice'] );
 	}
 
 	/**
@@ -136,6 +139,66 @@ class WTBulkPlugins {
 #endregion Basic functions
 
 #region Plugin Functions
-//
+	/**
+	 * Register bulk option
+	 *
+	 * @return array(string)
+	 */
+	public function register_bulk_action($bulk_actions)
+	{
+		$bulk_actions['wtbp_deactivate_and_delete'] = __('Deactivate and delete', 'bulk-plugins');
+		return $bulk_actions;
+	}
+
+	/**
+	 * Handler of bulk option
+	 *
+	 * @param $redirect_to
+	 * @param $doaction
+	 * @param $plugins
+	 *
+	 * @return string
+	 */
+	public function bulk_action_handler($redirect_to, $doaction, $plugins)
+	{
+		if( $doaction !== 'wtbp_deactivate_and_delete' )
+			return $redirect_to;
+		$dd_plugins = array();
+		foreach( $plugins as $plugin )
+		{
+			if ( current_user_can( 'deactivate_plugin', $plugin ) ) {
+				//deactivate_plugins( $plugin, true );
+
+				if ( current_user_can( 'delete_plugins' ) ) {
+					//delete_plugins( $plugin );
+
+					$dd_plugins[] = get_plugin_data( trailingslashit(WP_PLUGIN_DIR).$plugin, false, true);
+				}
+			}
+		}
+
+		$redirect_to = add_query_arg(
+			array(
+				'wtbp_bulk_action' => count($dd_plugins) ? count($dd_plugins) : __('You do not have enough permissions to remove or deactivate plugins','bulk-plugins'),
+			),
+			$redirect_to );
+
+		return $redirect_to;
+	}
+
+	/**
+	 * Admin notice after bulk action
+	 *
+	 */
+	public function wtbp_bulk_action_admin_notice()
+	{
+		if( empty( $_GET['wtbp_bulk_action'] ) )
+			return;
+
+		$data = htmlspecialchars( strip_tags( $_GET['wtbp_bulk_action']));
+		$msg = "<b>".__('Plugins deactivated and delete: ','bulk-plugins')."</b>".$data;
+		echo '<div id="message" class="updated"><p>'. $msg .'</p></div>';
+	}
+
 #endregion Plugin Functions
 }

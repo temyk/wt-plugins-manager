@@ -74,10 +74,6 @@ require WTBP_PLUGIN_PATH.'includes/class-wtbulkplugins.php';
  *
  * @since    1.0.0
  */
-function run_temyk() {
 
-	$plugin = new Temyk();
-	$plugin->run();
-
-}
-run_temyk();
+global $WTBP_Plugin;
+$WTBP_Plugin = new WTBulkPlugins();

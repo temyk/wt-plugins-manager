@@ -1,0 +1,51 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Bulk Plugin Manager\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-11-14 13:33+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: \n"
+"Language: \n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Loco https://localise.biz/\n"
+"X-Loco-Version: 2.3.1; wp-5.3"
+
+#: includes/class-wtbulkplugins.php:114
+msgid "Are you sure you want to deactivate and remove the plugin?"
+msgstr ""
+
+#: includes/class-wtbulkplugins.php:159 includes/class-wtbulkplugins.php:211
+msgid "Deactivate and delete"
+msgstr ""
+
+#: includes/class-wtbulkplugins.php:184
+msgid "You do not have enough permissions to remove or deactivate plugins"
+msgstr ""
+
+#: includes/class-wtbulkplugins.php:201
+msgid "Plugins deactivated and delete: "
+msgstr ""
+
+#. Name of the plugin
+msgid "Bulk Plugin Manager"
+msgstr ""
+
+#. Description of the plugin
+msgid ""
+"This plugin allows you to bulk deactivate and immediately remove other "
+"plugins"
+msgstr ""
+
+#. URI of the plugin
+#. Author URI of the plugin
+msgid "temyk.ru"
+msgstr ""
+
+#. Author of the plugin
+msgid "Webtemyk"
+msgstr ""

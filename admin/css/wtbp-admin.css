@@ -2,3 +2,13 @@
  * All of the CSS for your admin-specific functionality should be
  * included in this file.
  */
+#wtbp-delete-confirm
+{
+    color: #a00;
+    border: none;
+}
+#wtbp-delete-confirm:hover
+ {
+    color: #dc3232;
+    text-decoration: underline;
+ }

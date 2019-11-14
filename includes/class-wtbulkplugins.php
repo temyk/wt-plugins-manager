@@ -253,8 +253,7 @@ class WTBulkPlugins {
 			deactivate_plugins( $plugin, true );
 
 			if ( current_user_can( 'delete_plugins' ) ) {
-				// TODO: раскомментировать!
-				//delete_plugins( $plugin );
+				delete_plugins( $plugin );
 
 				return true;
 			}

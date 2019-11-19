@@ -133,12 +133,12 @@ class WTBulkPlugins {
 	 * @since     1.0.0
 	 */
 	public function register_menu() {
-		add_options_page(
-			'Bulk Plugin Manager settings',
-			'Bulk Plugin Manager',
-			'manage_options',
-			'wtbp-settings',
-			array($this, 'show_settings') );
+//		add_options_page(
+//			__( 'Plugins Manager settings', 'bulk-plugins' ),
+//			__( 'Plugins Manager', 'bulk-plugins' ),
+//			'manage_options',
+//			'wtbp-settings',
+//			array($this, 'show_settings') );
 	}
 
 	/**
@@ -236,7 +236,9 @@ class WTBulkPlugins {
 	 */
 	public function add_action_links( $actions, $plugin_file, $plugin_data, $context ) {
 		if ( is_plugin_active( $plugin_file ) ) {
-			$actions[] = '<a href="' . add_query_arg(array( 'action' => 'deactivate_and_delete', 'plugin' => urlencode( $plugin_file ) )) .'" id="wtbp-delete-confirm">' . __( 'Deactivate and delete', 'bulk-plugins' ) . '</a>';
+			$actions[] = '<a href="' .
+			             add_query_arg(array( 'action' => 'deactivate_and_delete', 'plugin' => urlencode( $plugin_file ) )) .
+			             '" id="wtbp-delete-confirm">' . __( 'Deactivate and delete', 'bulk-plugins' ) . '</a>';
 		}
 
 		return $actions;
@@ -253,7 +255,7 @@ class WTBulkPlugins {
 			deactivate_plugins( $plugin, true );
 
 			if ( current_user_can( 'delete_plugins' ) ) {
-				delete_plugins( $plugin );
+				delete_plugins( array($plugin) );
 
 				return true;
 			}

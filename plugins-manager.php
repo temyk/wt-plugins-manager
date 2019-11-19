@@ -1,7 +1,6 @@
 <?php
 /**
- * Plugin Name:       Bulk Plugin Manager
- * Plugin URI:        temyk.ru
+ * Plugin Name:       Plugins Manager
  * Description:       This plugin allows you to bulk deactivate and immediately remove other plugins
  * Version:           1.0.0
  * Author:            Webtemyk

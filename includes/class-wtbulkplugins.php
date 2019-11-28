@@ -42,6 +42,15 @@ class WTBulkPlugins {
 	 */
 	protected $version;
 
+	/**
+	 * Saved icons of the plugins.
+	 *
+	 * @since    1.1.0
+	 * @access   protected
+	 * @var      array
+	 */
+	protected $saved_icons;
+
 #endregion Properties
 
 #region Basic functions
@@ -62,6 +71,7 @@ class WTBulkPlugins {
 			$this->version = '1.0.0';
 		}
 		$this->plugin_name = WTBP_PLUGIN_SLUG;
+		$this->saved_icons = get_option( "wtbp_plugins_icons", array());
 
 		$this->define_admin();
 		$this->define_public();
@@ -77,14 +87,17 @@ class WTBulkPlugins {
 	private function define_admin() {
 
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ), 10, 1 );
+		add_action( 'admin_notices', array( $this, 'bulk_action_admin_notice' ) );
+		add_action( 'admin_menu', array($this, 'register_menu') );
 
 		add_filter( 'bulk_actions-plugins', array( $this, 'register_bulk_action' ) );
 		add_filter( 'handle_bulk_actions-plugins', array( $this, 'bulk_action_handler' ), 10, 3 );
 
-		add_action( 'admin_notices', array( $this, 'bulk_action_admin_notice' ) );
-		add_action( 'admin_menu', array($this, 'register_menu') );
-
 		add_filter( 'plugin_action_links', array( $this, 'add_action_links' ), 10, 4 );
+		add_filter( "manage_plugins_columns", array( $this, 'add_plugins_column' ), 10, 1 );
+		add_action( 'manage_plugins_custom_column', array( $this, 'manage_plugins_column' ), 10, 3 );
+
+		add_action( 'activated_plugin', array( $this, 'activated_plugin' ), 10, 2 );
 
 		add_action( 'current_screen', array($this, 'plugin_screen_hook') );
 	}
@@ -184,7 +197,7 @@ class WTBulkPlugins {
 	 * @return array(string)
 	 */
 	public function register_bulk_action( $bulk_actions ) {
-		$bulk_actions['wtbp_deactivate_and_delete'] = __( 'Deactivate and delete', 'bulk-plugins' );
+		$bulk_actions['wtbp_deactivate_and_delete'] = __( 'Delete', 'bulk-plugins' );
 
 		return $bulk_actions;
 	}
@@ -238,10 +251,85 @@ class WTBulkPlugins {
 		if ( is_plugin_active( $plugin_file ) ) {
 			$actions[] = '<a href="' .
 			             add_query_arg(array( 'action' => 'deactivate_and_delete', 'plugin' => urlencode( $plugin_file ) )) .
-			             '" id="wtbp-delete-confirm">' . __( 'Deactivate and delete', 'bulk-plugins' ) . '</a>';
+			             '" id="wtbp-delete-confirm">' . __( 'Delete', 'bulk-plugins' ) . '</a>';
 		}
 
 		return $actions;
+	}
+
+	/**
+	 * Add Image column in plugins page
+	 *
+	 * @return array Columns
+	 */
+	public function add_plugins_column( $columns ) {
+		$fkey = array_key_first($columns);
+		$first_column = array($fkey => $columns[$fkey]);
+		array_shift($columns);
+		$image_column['image'] = __('Image','bulk-plugins');
+
+		return array_merge($first_column, $image_column, $columns);
+	}
+
+	/**
+	 * Manage Image column in plugins page
+	 *
+	 */
+	public function manage_plugins_column( $column_name, $plugin_file, $plugin_data ) {
+		if('image' == $column_name)
+		{
+			$icon = $this->get_plugin_icon($plugin_file);
+
+			if(! empty($icon) )
+			{
+				echo "<div class='wtbp-plugin-icon' style='background-image: url({$icon});'></div>";
+			}
+		}
+	}
+	/**
+	 * Get and save plugin icon
+	 *
+	 * @param string $plugin_file
+	 * @return string
+	 */
+	public function get_plugin_icon( $plugin_file ) {
+		$slug = explode('/', $plugin_file)[0];
+		$icon = "";
+		$saved_icons = $this->saved_icons;
+		if ( isset( $saved_icons[ $slug ]['icon'] ) ) {
+			$icon = $saved_icons[ $slug ]['icon'];
+		} else {
+			$args = array(
+				'slug'   => $slug,
+				'fields' => 'icons',
+			);
+			require_once ABSPATH . "wp-admin/includes/plugin-install.php";
+			$data = plugins_api( 'plugin_information', $args );
+
+			if ( ! empty( $data->icons['svg'] ) ) {
+				$icon = $data->icons['svg'];
+			} elseif ( ! empty( $data->icons['1x'] ) ) {
+				$icon = $data->icons['1x'];
+			} elseif ( ! empty( $data->icons['default'] ) ) {
+				$icon = $data->icons['default'];
+			}
+
+		}
+
+		if($icon) {
+			$saved_icons[ $slug ]['icon'] = $icon;
+			update_option( "wtbp_plugins_icons", $saved_icons );
+		}
+		return $icon;
+	}
+
+	/**
+	 * Action after plugin activated
+	 *
+	 * @param string $plugin
+	 */
+	public function activated_plugin( $plugin, $network ) {
+		$temp = $this->get_plugin_icon($plugin);
 	}
 
 	/**

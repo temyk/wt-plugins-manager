@@ -12,3 +12,28 @@
     color: #dc3232;
     text-decoration: underline;
  }
+
+.wtbp-plugin-icon
+{
+    border-radius: 5px;
+    background-size: cover;
+    height: 50px;
+    width: 50px;
+}
+
+table.plugins td.column-image
+{
+    width: 50px;
+}
+table.plugins td.column-image.inactive
+{
+    opacity: 0.3;
+    /*filter: grayscale(100%);
+    -webkit-filter: grayscale(100%);*/
+}
+table.plugins td.column-image.inactive:hover
+{
+    opacity: 1;
+
+}
+

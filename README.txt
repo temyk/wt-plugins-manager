@@ -29,5 +29,13 @@ Deleted plugins cannot be restored. However, most plugins do not remove their se
 
 == Changelog ==
 
-= 1.0 =
+= 1.1.0 =
+* [NEW] To the list of plugins added the column with a plugin icon.
+* The "Deactivate and delete" link has been replaced with "Delete"
+
+= 1.0.1 =
+* Temporarily hide settings page
+* Up version
+
+= 1.0.0 =
 * First release.

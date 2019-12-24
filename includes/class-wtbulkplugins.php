@@ -197,7 +197,7 @@ class WTBulkPlugins {
 	 * @return array(string)
 	 */
 	public function register_bulk_action( $bulk_actions ) {
-		$bulk_actions['wtbp_deactivate_and_delete'] = __( 'Delete', 'bulk-plugins' );
+		$bulk_actions['wtbp_deactivate_and_delete'] = __( 'Deactivate and delete', 'bulk-plugins' );
 
 		return $bulk_actions;
 	}
@@ -263,9 +263,9 @@ class WTBulkPlugins {
 	 * @return array Columns
 	 */
 	public function add_plugins_column( $columns ) {
-		$fkey = array_key_first($columns);
-		$first_column = array($fkey => $columns[$fkey]);
-		array_shift($columns);
+		//$first_column = reset($columns);
+		$first_column = array_shift($columns);
+		$first_column = array($first_column);
 		$image_column['image'] = __('Image','bulk-plugins');
 
 		return array_merge($first_column, $image_column, $columns);
@@ -314,12 +314,12 @@ class WTBulkPlugins {
 				$icon = $data->icons['default'];
 			}
 
+			if($icon) {
+				$saved_icons[ $slug ]['icon'] = $icon;
+				update_option( "wtbp_plugins_icons", $saved_icons );
+			}
 		}
 
-		if($icon) {
-			$saved_icons[ $slug ]['icon'] = $icon;
-			update_option( "wtbp_plugins_icons", $saved_icons );
-		}
 		return $icon;
 	}
 

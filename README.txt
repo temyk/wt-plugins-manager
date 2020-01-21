@@ -29,6 +29,12 @@ Deleted plugins cannot be restored. However, most plugins do not remove their se
 
 == Changelog ==
 
+= 1.1.2 =
+* Fixed "Check all" doesn’t work
+
+= 1.1.1 =
+* Fixed white screen on plugins page
+
 = 1.1.0 =
 * [NEW] To the list of plugins added the column with a plugin icon.
 * The "Deactivate and delete" link has been replaced with "Delete"

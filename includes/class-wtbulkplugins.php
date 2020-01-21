@@ -265,7 +265,7 @@ class WTBulkPlugins {
 	public function add_plugins_column( $columns ) {
 		//$first_column = reset($columns);
 		$first_column = array_shift($columns);
-		$first_column = array($first_column);
+		$first_column = array('cb' => $first_column);
 		$image_column['image'] = __('Image','bulk-plugins');
 
 		return array_merge($first_column, $image_column, $columns);

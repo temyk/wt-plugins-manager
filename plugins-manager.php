@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Plugins Manager
  * Description:       This plugin allows you to bulk deactivate and immediately remove other plugins
- * Version:           1.1.0
+ * Version:           1.1.2
  * Author:            Webtemyk
  * Author URI:        temyk.ru
  * License:           GPL-2.0+

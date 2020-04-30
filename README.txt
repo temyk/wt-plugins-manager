@@ -2,7 +2,7 @@
 Contributors: webtemyk
 Tags: plugins, bulk, manager, developer
 Requires at least: 4.6
-Tested up to: 5.3.0
+Tested up to: 5.4.0
 Stable tag: trunk
 Requires PHP: 5.6.0
 License: GPLv2 or later
@@ -28,6 +28,10 @@ Deleted plugins cannot be restored. However, most plugins do not remove their se
 1. This is the link to deactivate and remove plugin
 
 == Changelog ==
+
+= 1.2.0 =
+* Performance has been improved.
+* Added sorting of plugins
 
 = 1.1.2 =
 * Fixed "Check all" doesn’t work

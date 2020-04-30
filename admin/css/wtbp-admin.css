@@ -27,13 +27,27 @@ table.plugins td.column-image
 }
 table.plugins td.column-image.inactive
 {
-    opacity: 0.3;
-    /*filter: grayscale(100%);
-    -webkit-filter: grayscale(100%);*/
+    opacity: 0.7;
+    filter: grayscale(100%);
+    -webkit-filter: grayscale(100%);
 }
 table.plugins td.column-image.inactive:hover
 {
     opacity: 1;
-
+    filter: none;
+    -webkit-filter: none;
+}
+table.wp-list-table.plugins tbody tr.inactive
+{
+    opacity: 0.7;
+}
+table.plugins tbody tr:hover
+{
+    background-color: #dff6ff !important;
+}
+table.plugins .active td, .plugins .active th
+{
+    background-color: inherit !important;
+    opacity: 1 !important;
 }
 

@@ -50,4 +50,14 @@ table.plugins .active td, .plugins .active th
     background-color: inherit !important;
     opacity: 1 !important;
 }
+.wtbp-git-icon
+{
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 5px;
+    width: 20px;
+    height: 20px;
+    background: url('../img/git.png') no-repeat center center;
+    background-size: contain;
+}
 

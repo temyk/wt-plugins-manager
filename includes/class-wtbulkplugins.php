@@ -99,7 +99,70 @@ class WTBulkPlugins {
 		add_action( 'manage_plugins_sortable_columns', array( $this, 'manage_plugins_sortable' ), 10, 1 );
 		add_filter( 'views_plugins', [ $this, 'add_filter_link' ], 10, 1 );
 
-		add_action( 'current_screen', array( $this, 'plugin_screen_hook' ) );
+		add_action( 'current_screen', [ $this, 'plugin_screen_hook' ] );
+
+		add_filter( 'plugin_row_meta', [ $this, 'add_update_icons' ], 99999, 4 );
+		add_filter( 'site_transient_update_plugins', [ $this, 'disable_plugin_updates_if_git' ] );
+	}
+
+	/**
+	 * Checks whether the git-repository is active in the plugin folder
+	 *
+	 * @param $plugin_file
+	 *
+	 * @return bool
+	 */
+	public function is_plugin_git( $plugin_file ) {
+		$slug = explode( '/', $plugin_file );
+		if ( isset( $slug[0] ) ) {
+			$slug = $slug[0];
+		} else {
+			return false;
+		}
+
+		if ( file_exists( WP_PLUGIN_DIR . "/{$slug}/.git" ) ) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * @param $meta
+	 * @param $plugin_file
+	 * @param $plugin_data
+	 * @param $status
+	 *
+	 * @return mixed
+	 */
+	function add_update_icons( $meta, $plugin_file, $plugin_data, $status ) {
+
+		if ( $this->is_plugin_git( $plugin_file ) ) {
+			$meta[0] .= "<span class='wtbp-git-icon' title='".__('This plugin is installed as a GIT repository!', 'bulk-plugins')."'></span>";
+		}
+
+		if ( version_compare( $plugin_data['new_version'], $plugin_data['Version'], '>' ) && $this->is_plugin_git( $plugin_file ) ) {
+			$update_href = wp_nonce_url( self_admin_url( "update.php?action=upgrade-plugin&plugin={$plugin_file}" ), "upgrade-plugin_{$plugin_file}" );
+			$meta[]      = "<div class='update-message notice inline notice-warning notice-alt' style='display: inline-block;'><p style='margin: 0 !important;'><a href='{$update_href}'>Update to {$plugin_data['new_version']}</a></p></div>";
+		}
+
+		return $meta;
+	}
+
+	/**
+	 * @param $value
+	 *
+	 * @return mixed
+	 */
+	public function disable_plugin_updates_if_git( $value ) {
+		foreach ( $value->response as $key => $item ) {
+			if ( $this->is_plugin_git( $key ) ) {
+				$value->no_update[ $key ] = $item;
+				unset( $value->response[ $key ] );
+			}
+		}
+
+		return $value;
 	}
 
 	/**
@@ -311,9 +374,9 @@ class WTBulkPlugins {
 	 * Add filter on the Posts list tables.
 	 *
 	 */
-	public function add_filter_link($views)
-	{
-		$views['plugins_filter'] = '<a href="#" class="wtbp_sort_plugins" data-sort="active">'.__('Sort plugins','bulk-plugins').'</a>';
+	public function add_filter_link( $views ) {
+		$views['plugins_filter'] = '<a href="#" class="wtbp_sort_plugins" data-sort="active">' . __( 'Sort plugins', 'bulk-plugins' ) . '</a>';
+
 		return $views;
 
 	}

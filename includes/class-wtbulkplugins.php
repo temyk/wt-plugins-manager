@@ -141,7 +141,7 @@ class WTBulkPlugins {
 			$meta[0] .= "<span class='wtbp-git-icon' title='".__('This plugin is installed as a GIT repository!', 'bulk-plugins')."'></span>";
 		}
 
-		if ( version_compare( $plugin_data['new_version'], $plugin_data['Version'], '>' ) && $this->is_plugin_git( $plugin_file ) ) {
+		if ( isset($plugin_data['new_version'] ) && version_compare( $plugin_data['new_version'], $plugin_data['Version'], '>' ) && $this->is_plugin_git( $plugin_file ) ) {
 			$update_href = wp_nonce_url( self_admin_url( "update.php?action=upgrade-plugin&plugin={$plugin_file}" ), "upgrade-plugin_{$plugin_file}" );
 			$meta[]      = "<div class='update-message notice inline notice-warning notice-alt' style='display: inline-block;'><p style='margin: 0 !important;'><a href='{$update_href}'>Update to {$plugin_data['new_version']}</a></p></div>";
 		}

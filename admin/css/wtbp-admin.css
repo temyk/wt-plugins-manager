@@ -12,3 +12,52 @@
     color: #dc3232;
     text-decoration: underline;
  }
+
+.wtbp-plugin-icon
+{
+    border-radius: 5px;
+    background-size: cover;
+    height: 50px;
+    width: 50px;
+}
+
+table.plugins td.column-image
+{
+    width: 50px;
+}
+table.plugins td.column-image.inactive
+{
+    opacity: 0.7;
+    filter: grayscale(100%);
+    -webkit-filter: grayscale(100%);
+}
+table.plugins td.column-image.inactive:hover
+{
+    opacity: 1;
+    filter: none;
+    -webkit-filter: none;
+}
+table.wp-list-table.plugins tbody tr.inactive
+{
+    opacity: 0.7;
+}
+table.plugins tbody tr:hover
+{
+    background-color: #dff6ff !important;
+}
+table.plugins .active td, .plugins .active th
+{
+    background-color: inherit !important;
+    opacity: 1 !important;
+}
+.wtbp-git-icon
+{
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 5px;
+    width: 20px;
+    height: 20px;
+    background: url('../img/git.png') no-repeat center center;
+    background-size: contain;
+}
+

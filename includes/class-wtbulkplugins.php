@@ -42,6 +42,15 @@ class WTBulkPlugins {
 	 */
 	protected $version;
 
+	/**
+	 * Saved icons of the plugins.
+	 *
+	 * @since    1.1.0
+	 * @access   protected
+	 * @var      array
+	 */
+	protected $saved_icons;
+
 #endregion Properties
 
 #region Basic functions
@@ -62,6 +71,7 @@ class WTBulkPlugins {
 			$this->version = '1.0.0';
 		}
 		$this->plugin_name = WTBP_PLUGIN_SLUG;
+		$this->saved_icons = $this->getSavedIcons();
 
 		$this->define_admin();
 		$this->define_public();
@@ -77,16 +87,82 @@ class WTBulkPlugins {
 	private function define_admin() {
 
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ), 10, 1 );
+		add_action( 'admin_notices', array( $this, 'bulk_action_admin_notice' ) );
+		add_action( 'admin_menu', array( $this, 'register_menu' ) );
 
 		add_filter( 'bulk_actions-plugins', array( $this, 'register_bulk_action' ) );
 		add_filter( 'handle_bulk_actions-plugins', array( $this, 'bulk_action_handler' ), 10, 3 );
 
-		add_action( 'admin_notices', array( $this, 'bulk_action_admin_notice' ) );
-		add_action( 'admin_menu', array($this, 'register_menu') );
-
 		add_filter( 'plugin_action_links', array( $this, 'add_action_links' ), 10, 4 );
+		add_filter( "manage_plugins_columns", array( $this, 'add_plugins_column' ), 10, 1 );
+		add_action( 'manage_plugins_custom_column', array( $this, 'manage_plugins_column' ), 10, 3 );
+		add_action( 'manage_plugins_sortable_columns', array( $this, 'manage_plugins_sortable' ), 10, 1 );
+		add_filter( 'views_plugins', [ $this, 'add_filter_link' ], 10, 1 );
 
-		add_action( 'current_screen', array($this, 'plugin_screen_hook') );
+		add_action( 'current_screen', [ $this, 'plugin_screen_hook' ] );
+
+		add_filter( 'plugin_row_meta', [ $this, 'add_update_icons' ], 99999, 4 );
+		add_filter( 'site_transient_update_plugins', [ $this, 'disable_plugin_updates_if_git' ] );
+	}
+
+	/**
+	 * Checks whether the git-repository is active in the plugin folder
+	 *
+	 * @param $plugin_file
+	 *
+	 * @return bool
+	 */
+	public function is_plugin_git( $plugin_file ) {
+		$slug = explode( '/', $plugin_file );
+		if ( isset( $slug[0] ) ) {
+			$slug = $slug[0];
+		} else {
+			return false;
+		}
+
+		if ( file_exists( WP_PLUGIN_DIR . "/{$slug}/.git" ) ) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * @param $meta
+	 * @param $plugin_file
+	 * @param $plugin_data
+	 * @param $status
+	 *
+	 * @return mixed
+	 */
+	function add_update_icons( $meta, $plugin_file, $plugin_data, $status ) {
+
+		if ( $this->is_plugin_git( $plugin_file ) ) {
+			$meta[0] .= "<span class='wtbp-git-icon' title='".__('This plugin is installed as a GIT repository!', 'bulk-plugins')."'></span>";
+		}
+
+		if ( isset($plugin_data['new_version'] ) && version_compare( $plugin_data['new_version'], $plugin_data['Version'], '>' ) && $this->is_plugin_git( $plugin_file ) ) {
+			$update_href = wp_nonce_url( self_admin_url( "update.php?action=upgrade-plugin&plugin={$plugin_file}" ), "upgrade-plugin_{$plugin_file}" );
+			$meta[]      = "<div class='update-message notice inline notice-warning notice-alt' style='display: inline-block;'><p style='margin: 0 !important;'><a href='{$update_href}'>Update to {$plugin_data['new_version']}</a></p></div>";
+		}
+
+		return $meta;
+	}
+
+	/**
+	 * @param $value
+	 *
+	 * @return mixed
+	 */
+	public function disable_plugin_updates_if_git( $value ) {
+		foreach ( $value->response as $key => $item ) {
+			if ( $this->is_plugin_git( $key ) ) {
+				$value->no_update[ $key ] = $item;
+				unset( $value->response[ $key ] );
+			}
+		}
+
+		return $value;
 	}
 
 	/**
@@ -107,13 +183,10 @@ class WTBulkPlugins {
 	 * @since     1.0.0
 	 */
 	public function admin_enqueue_scripts( $screen ) {
-		if('plugins.php' === $screen) {
+		if ( 'plugins.php' === $screen ) {
 			wp_enqueue_style( WTBP_PLUGIN_PREFIX . 'admin-basic-style', WTBP_PLUGIN_URL . '/admin/css/wtbp-admin.css', array() );
 			wp_enqueue_script( WTBP_PLUGIN_PREFIX . 'admin-basic-script', WTBP_PLUGIN_URL . '/admin/js/wtbp-admin.js', array() );
-			wp_localize_script(
-				WTBP_PLUGIN_PREFIX . 'admin-basic-script',
-				'wtbp_confirm_text', __( 'Are you sure you want to deactivate and remove the plugin?', 'bulk-plugins' )
-			);
+			wp_localize_script( WTBP_PLUGIN_PREFIX . 'admin-basic-script', 'wtbp_confirm_text', __( 'Are you sure you want to deactivate and remove the plugin?', 'bulk-plugins' ) );
 		}
 
 	}
@@ -166,16 +239,28 @@ class WTBulkPlugins {
 
 #region Plugin Functions
 	/**
+	 * Get saved icons
+	 *
+	 * @return array
+	 * @since     1.1.3
+	 *
+	 */
+	public function getSavedIcons() {
+		$saved_icons = get_transient( "wtbp_plugins_icons" );
+
+		return false !== $saved_icons ? $saved_icons : array();
+	}
+
+	/**
 	 * Settings page
 	 *
 	 */
 	public function show_settings() {
-		if(isset($_POST['wtbp_work_format']))
-		{
-			update_option( WTBP_PLUGIN_PREFIX.'work_format', (int) $_POST['wtbp_work_format']);
+		if ( isset( $_POST['wtbp_work_format'] ) ) {
+			update_option( WTBP_PLUGIN_PREFIX . 'work_format', (int) $_POST['wtbp_work_format'] );
 			echo '<div id="message" class="updated"><p>' . __( 'Settings updated', 'bulk-plugins' ) . '</p></div>';
 		}
-		require_once WTBP_PLUGIN_PATH."admin/settings.php";
+		require_once WTBP_PLUGIN_PATH . "admin/settings.php";
 	}
 
 	/**
@@ -204,14 +289,14 @@ class WTBulkPlugins {
 		}
 		$dd_plugins = 0;
 		foreach ( $plugins as $plugin ) {
-			if($this->deactivate_and_delete($plugin)) $dd_plugins++;
+			if ( $this->deactivate_and_delete( $plugin ) ) {
+				$dd_plugins ++;
+			}
 		}
 
-		$redirect_to = add_query_arg(
-			array(
-				'wtbp_bulk_action' => $dd_plugins ? $dd_plugins : __( 'You do not have enough permissions to remove or deactivate plugins', 'bulk-plugins' ),
-			),
-			$redirect_to );
+		$redirect_to = add_query_arg( array(
+			'wtbp_bulk_action' => $dd_plugins ? $dd_plugins : __( 'You do not have enough permissions to remove or deactivate plugins', 'bulk-plugins' ),
+		), $redirect_to );
 
 		return $redirect_to;
 	}
@@ -236,18 +321,111 @@ class WTBulkPlugins {
 	 */
 	public function add_action_links( $actions, $plugin_file, $plugin_data, $context ) {
 		if ( is_plugin_active( $plugin_file ) ) {
-			$actions[] = '<a href="' .
-			             add_query_arg(array( 'action' => 'deactivate_and_delete', 'plugin' => urlencode( $plugin_file ) )) .
-			             '" id="wtbp-delete-confirm">' . __( 'Deactivate and delete', 'bulk-plugins' ) . '</a>';
+			$actions[] = '<a href="' . add_query_arg( array(
+					'action' => 'deactivate_and_delete',
+					'plugin' => urlencode( $plugin_file )
+				) ) . '" id="wtbp-delete-confirm">' . __( 'Delete', 'bulk-plugins' ) . '</a>';
 		}
 
 		return $actions;
 	}
 
 	/**
+	 * Add Image column in plugins page
+	 *
+	 * @return array Columns
+	 */
+	public function add_plugins_column( $columns ) {
+		//$first_column = reset($columns);
+		$first_column          = array_shift( $columns );
+		$first_column          = array( 'cb' => $first_column );
+		$image_column['image'] = __( 'Image', 'bulk-plugins' );
+
+		return array_merge( $first_column, $image_column, $columns );
+	}
+
+	/**
+	 * Manage Image column in plugins page
+	 *
+	 */
+	public function manage_plugins_column( $column_name, $plugin_file, $plugin_data ) {
+		if ( 'image' == $column_name ) {
+			$icon = isset( $plugin_data['icons'] ) ? $plugin_data['icons']['1x'] : '';
+
+			if ( ! empty( $icon ) ) {
+				echo "<div class='wtbp-plugin-icon' style='background-image: url({$icon});'></div>";
+			}
+		}
+	}
+
+	/**
+	 * Add sortable column
+	 *
+	 */
+	public function manage_plugins_sortable( $sortable_columns ) {
+		$sortable_columns['name'] = [ 'Name', false ];
+
+		// false = asc (по умолчанию), true  = desc
+
+		return $sortable_columns;
+	}
+
+	/**
+	 * Add filter on the Posts list tables.
+	 *
+	 */
+	public function add_filter_link( $views ) {
+		$views['plugins_filter'] = '<a href="#" class="wtbp_sort_plugins" data-sort="active">' . __( 'Sort plugins', 'bulk-plugins' ) . '</a>';
+
+		return $views;
+
+	}
+
+	/**
+	 * Get and save plugin icon
+	 *
+	 * @param string $plugin_file
+	 *
+	 * @return string
+	 */
+	public function get_plugin_icon( $plugin_file ) {
+		$slug = explode( '/', $plugin_file )[0];
+		$icon = "";
+
+		$saved_icons = $this->saved_icons;
+		if ( isset( $saved_icons[ $slug ]['icon'] ) ) {
+			$icon = $saved_icons[ $slug ]['icon'];
+		} else {
+			$args = array(
+				'slug'   => $slug,
+				'fields' => 'icons',
+			);
+			require_once ABSPATH . "wp-admin/includes/plugin-install.php";
+			$data = plugins_api( 'plugin_information', $args );
+
+			if ( ! empty( $data->icons['svg'] ) ) {
+				$icon = $data->icons['svg'];
+			} elseif ( ! empty( $data->icons['1x'] ) ) {
+				$icon = $data->icons['1x'];
+			} elseif ( ! empty( $data->icons['default'] ) ) {
+				$icon = $data->icons['default'];
+			}
+
+			if ( $icon ) {
+				$saved_icons[ $slug ]['icon'] = $icon;
+				set_transient( "wtbp_plugins_icons", $saved_icons, DAY_IN_SECONDS * 30 );
+				$this->saved_icons = $saved_icons;
+			}
+		}
+
+		return $icon;
+	}
+
+	/**
 	 * Deactivate and delete plugin
 	 *
 	 * @param string $plugin
+	 *
 	 * @return bool
 	 */
 	public function deactivate_and_delete( $plugin ) {
@@ -255,7 +433,7 @@ class WTBulkPlugins {
 			deactivate_plugins( $plugin, true );
 
 			if ( current_user_can( 'delete_plugins' ) ) {
-				delete_plugins( array($plugin) );
+				delete_plugins( array( $plugin ) );
 
 				return true;
 			}
@@ -269,14 +447,12 @@ class WTBulkPlugins {
 	 *
 	 */
 	public function plugin_screen_hook( $screen ) {
-		if('plugins' == $screen->id)
-		{
-			if(isset($_GET['action']) && isset($_GET['plugin']) && $_GET['action'] === 'deactivate_and_delete')
-			{
-				$this->deactivate_and_delete(urldecode( $_GET['plugin']));
+		if ( 'plugins' == $screen->id ) {
+			if ( isset( $_GET['action'] ) && isset( $_GET['plugin'] ) && $_GET['action'] === 'deactivate_and_delete' ) {
+				$this->deactivate_and_delete( urldecode( $_GET['plugin'] ) );
 
 				$_SERVER['REQUEST_URI'] = remove_query_arg( array( 'action', 'plugin' ), $_SERVER['REQUEST_URI'] );
-				wp_redirect( add_query_arg( array("deleted" => "true"), $_SERVER['REQUEST_URI'] ) );
+				wp_redirect( add_query_arg( array( "deleted" => "true" ), $_SERVER['REQUEST_URI'] ) );
 				$_SERVER['REQUEST_URI'] = remove_query_arg( array( 'deleted' ), $_SERVER['REQUEST_URI'] );
 			}
 		}

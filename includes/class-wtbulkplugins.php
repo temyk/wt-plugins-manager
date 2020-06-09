@@ -350,7 +350,9 @@ class WTBulkPlugins {
 	 */
 	public function manage_plugins_column( $column_name, $plugin_file, $plugin_data ) {
 		if ( 'image' == $column_name ) {
-			$icon = isset( $plugin_data['icons'] ) ? $plugin_data['icons']['1x'] : '';
+			if(isset( $plugin_data['icons'] )){
+				$icon = isset( $plugin_data['icons']['1x'] ) ? $plugin_data['icons']['1x'] : $plugin_data['icons']['default'];
+			}
 
 			if ( ! empty( $icon ) ) {
 				echo "<div class='wtbp-plugin-icon' style='background-image: url({$icon});'></div>";

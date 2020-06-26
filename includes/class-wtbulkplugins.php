@@ -102,7 +102,19 @@ class WTBulkPlugins {
 		add_action( 'current_screen', [ $this, 'plugin_screen_hook' ] );
 
 		add_filter( 'plugin_row_meta', [ $this, 'add_update_icons' ], 99999, 4 );
-		add_filter( 'site_transient_update_plugins', [ $this, 'disable_plugin_updates_if_git' ] );
+		add_filter( 'site_transient_update_plugins', [ $this, 'disable_plugin_updates_if_git' ], 10, 2 );
+
+		if ( get_option( WTBP_PLUGIN_PREFIX . 'update_changelog', true ) ) {
+			$updates = get_site_transient( 'update_plugins' );
+			foreach ( $updates->response as $update ) {
+				if ( $update ) {
+					add_action( "in_plugin_update_message-{$update->plugin}", [
+						$this,
+						'changelog_in_update_message'
+					], 10, 2 );
+				}
+			}
+		}
 	}
 
 	/**
@@ -138,10 +150,10 @@ class WTBulkPlugins {
 	function add_update_icons( $meta, $plugin_file, $plugin_data, $status ) {
 
 		if ( $this->is_plugin_git( $plugin_file ) ) {
-			$meta[0] .= "<span class='wtbp-git-icon' title='".__('This plugin is installed as a GIT repository!', 'bulk-plugins')."'></span>";
+			$meta[0] .= "<span class='wtbp-git-icon' title='" . __( 'This plugin is installed as a GIT repository!', 'bulk-plugins' ) . "'></span>";
 		}
 
-		if ( isset($plugin_data['new_version'] ) && version_compare( $plugin_data['new_version'], $plugin_data['Version'], '>' ) && $this->is_plugin_git( $plugin_file ) ) {
+		if ( isset( $plugin_data['new_version'] ) && version_compare( $plugin_data['new_version'], $plugin_data['Version'], '>' ) && $this->is_plugin_git( $plugin_file ) ) {
 			$update_href = wp_nonce_url( self_admin_url( "update.php?action=upgrade-plugin&plugin={$plugin_file}" ), "upgrade-plugin_{$plugin_file}" );
 			$meta[]      = "<div class='update-message notice inline notice-warning notice-alt' style='display: inline-block;'><p style='margin: 0 !important;'><a href='{$update_href}'>Update to {$plugin_data['new_version']}</a></p></div>";
 		}
@@ -154,11 +166,13 @@ class WTBulkPlugins {
 	 *
 	 * @return mixed
 	 */
-	public function disable_plugin_updates_if_git( $value ) {
-		foreach ( $value->response as $key => $item ) {
-			if ( $this->is_plugin_git( $key ) ) {
-				$value->no_update[ $key ] = $item;
-				unset( $value->response[ $key ] );
+	public function disable_plugin_updates_if_git( $value, $transient ) {
+		if ( is_object( $value ) && isset( $value->response ) && is_countable( $value->response ) ) {
+			foreach ( $value->response as $key => $item ) {
+				if ( $this->is_plugin_git( $key ) ) {
+					$value->no_update[ $key ] = $item;
+					unset( $value->response[ $key ] );
+				}
 			}
 		}
 
@@ -206,12 +220,12 @@ class WTBulkPlugins {
 	 * @since     1.0.0
 	 */
 	public function register_menu() {
-//		add_options_page(
-//			__( 'Plugins Manager settings', 'bulk-plugins' ),
-//			__( 'Plugins Manager', 'bulk-plugins' ),
-//			'manage_options',
-//			'wtbp-settings',
-//			array($this, 'show_settings') );
+		add_options_page(
+			__( 'Plugins Manager settings', 'bulk-plugins' ),
+			__( 'Plugins Manager', 'bulk-plugins' ),
+			'manage_options',
+			'wtbp-settings',
+			array( $this, 'show_settings' ) );
 	}
 
 	/**
@@ -256,10 +270,14 @@ class WTBulkPlugins {
 	 *
 	 */
 	public function show_settings() {
-		if ( isset( $_POST['wtbp_work_format'] ) ) {
-			update_option( WTBP_PLUGIN_PREFIX . 'work_format', (int) $_POST['wtbp_work_format'] );
+		if ( isset( $_POST['wtbp_update_changelog'] ) && check_admin_referer( 'wtbp_save_settings' ) ) {
+			update_option( WTBP_PLUGIN_PREFIX . 'update_changelog', (int) $_POST['wtbp_update_changelog'] );
 			echo '<div id="message" class="updated"><p>' . __( 'Settings updated', 'bulk-plugins' ) . '</p></div>';
 		}
+
+		$options = [
+			'update_changelog' => get_option( WTBP_PLUGIN_PREFIX . 'update_changelog', 1 ),
+		];
 		require_once WTBP_PLUGIN_PATH . "admin/settings.php";
 	}
 
@@ -350,7 +368,7 @@ class WTBulkPlugins {
 	 */
 	public function manage_plugins_column( $column_name, $plugin_file, $plugin_data ) {
 		if ( 'image' == $column_name ) {
-			if(isset( $plugin_data['icons'] )){
+			if ( isset( $plugin_data['icons'] ) ) {
 				$icon = isset( $plugin_data['icons']['1x'] ) ? $plugin_data['icons']['1x'] : $plugin_data['icons']['default'];
 			}
 
@@ -458,6 +476,26 @@ class WTBulkPlugins {
 				$_SERVER['REQUEST_URI'] = remove_query_arg( array( 'deleted' ), $_SERVER['REQUEST_URI'] );
 			}
 		}
+	}
+
+	/**
+	 *
+	 * @param $plugin_data
+	 * @param $response
+	 */
+	public function changelog_in_update_message( $plugin_data, $response ) {
+		//$readme = file_get_contents( WP_PLUGIN_DIR . '/' . $plugin_data['plugin'] );
+		require_once ABSPATH . "wp-admin/includes/plugin-install.php";
+		$api    = plugins_api(
+			'plugin_information',
+			array(
+				'slug' => wp_unslash( $plugin_data['slug'] ),
+			)
+		);
+		$readme = explode( '<h4>', $api->sections['changelog'] );
+		$readme = '<h4>' . $readme[1];
+
+		echo "<div class='wtbp-update-message-changelog' style='display: block;'>{$readme}</div>";
 	}
 
 #endregion Plugin Functions

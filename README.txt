@@ -31,6 +31,10 @@ Deleted plugins cannot be restored. However, most plugins do not remove their se
 
 == Changelog ==
 
+= 1.2.4 =
+* Add settings page
+* Show changelog in update notices
+
 = 1.2.2 =
 * Fix git icon
 

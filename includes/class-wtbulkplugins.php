@@ -42,15 +42,6 @@ class WTBulkPlugins {
 	 */
 	protected $version;
 
-	/**
-	 * Saved icons of the plugins.
-	 *
-	 * @since    1.1.0
-	 * @access   protected
-	 * @var      array
-	 */
-	protected $saved_icons;
-
 #endregion Properties
 
 #region Basic functions
@@ -71,7 +62,6 @@ class WTBulkPlugins {
 			$this->version = '1.0.0';
 		}
 		$this->plugin_name = WTBP_PLUGIN_SLUG;
-		$this->saved_icons = $this->getSavedIcons();
 
 		$this->define_admin();
 		$this->define_public();
@@ -253,19 +243,6 @@ class WTBulkPlugins {
 
 #region Plugin Functions
 	/**
-	 * Get saved icons
-	 *
-	 * @return array
-	 * @since     1.1.3
-	 *
-	 */
-	public function getSavedIcons() {
-		$saved_icons = get_transient( "wtbp_plugins_icons" );
-
-		return false !== $saved_icons ? $saved_icons : array();
-	}
-
-	/**
 	 * Settings page
 	 *
 	 */
@@ -402,46 +379,6 @@ class WTBulkPlugins {
 	}
 
 	/**
-	 * Get and save plugin icon
-	 *
-	 * @param string $plugin_file
-	 *
-	 * @return string
-	 */
-	public function get_plugin_icon( $plugin_file ) {
-		$slug = explode( '/', $plugin_file )[0];
-		$icon = "";
-
-		$saved_icons = $this->saved_icons;
-		if ( isset( $saved_icons[ $slug ]['icon'] ) ) {
-			$icon = $saved_icons[ $slug ]['icon'];
-		} else {
-			$args = array(
-				'slug'   => $slug,
-				'fields' => 'icons',
-			);
-			require_once ABSPATH . "wp-admin/includes/plugin-install.php";
-			$data = plugins_api( 'plugin_information', $args );
-
-			if ( ! empty( $data->icons['svg'] ) ) {
-				$icon = $data->icons['svg'];
-			} elseif ( ! empty( $data->icons['1x'] ) ) {
-				$icon = $data->icons['1x'];
-			} elseif ( ! empty( $data->icons['default'] ) ) {
-				$icon = $data->icons['default'];
-			}
-
-			if ( $icon ) {
-				$saved_icons[ $slug ]['icon'] = $icon;
-				set_transient( "wtbp_plugins_icons", $saved_icons, DAY_IN_SECONDS * 30 );
-				$this->saved_icons = $saved_icons;
-			}
-		}
-
-		return $icon;
-	}
-
-	/**
 	 * Deactivate and delete plugin
 	 *
 	 * @param string $plugin
@@ -484,16 +421,24 @@ class WTBulkPlugins {
 	 * @param $response
 	 */
 	public function changelog_in_update_message( $plugin_data, $response ) {
-		//$readme = file_get_contents( WP_PLUGIN_DIR . '/' . $plugin_data['plugin'] );
 		require_once ABSPATH . "wp-admin/includes/plugin-install.php";
-		$api    = plugins_api(
-			'plugin_information',
-			array(
-				'slug' => wp_unslash( $plugin_data['slug'] ),
-			)
-		);
-		$readme = explode( '<h4>', $api->sections['changelog'] );
-		$readme = '<h4>' . $readme[1];
+		$cache_option_name = WTBP_PLUGIN_PREFIX . $plugin_data['slug'] . '_' . $plugin_data['new_version'];
+		$readme = get_transient( $cache_option_name );
+
+		if ( ! $readme ) {
+			$api = plugins_api(
+				'plugin_information',
+				array(
+					'slug' => wp_unslash( $plugin_data['slug'] ),
+				)
+			);
+			if ( ! is_wp_error( $api ) ) {
+				$readme = explode( '<h4>', $api->sections['changelog'] );
+				$readme = '<h4>' . $readme[1];
+
+				set_transient( $cache_option_name, $readme, DAY_IN_SECONDS );
+			}
+		}
 
 		echo "<div class='wtbp-update-message-changelog' style='display: block;'>{$readme}</div>";
 	}

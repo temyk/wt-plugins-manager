@@ -14,7 +14,11 @@ It also adds features to the plugin page, such as icons and GIT status.
 == Description ==
 
 An additional "Deactivate and remove" link appears in the list of plugins. When you click on it, the plugin is deactivated and immediately deleted.
-The plugin list also displays logos and icons if the plugin is loaded via GIT. You can also sort plugins: the active first or the inactive first. The update notification for these plug-ins is reduced so as not to distract attention from updating other plug-ins
+The plugin list also displays logos and icons if the plugin is loaded via GIT.
+You can also sort plugins: the active first or the inactive first.
+The update notification for these plug-ins is reduced so as not to distract attention from updating other plug-ins.
+Displays a changelog in the plugin update notice.
+
 
 == Installation ==
 
@@ -31,7 +35,7 @@ Deleted plugins cannot be restored. However, most plugins do not remove their se
 
 == Changelog ==
 
-= 1.2.4 =
+= 1.2.5 =
 * Add settings page
 * Show changelog in update notices
 

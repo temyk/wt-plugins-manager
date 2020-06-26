@@ -58,8 +58,8 @@ table.plugins .active td, .plugins .active th {
     background-size: contain;
 }
 
-.wtbp-update-message-changelog ~ p:before {
-    content: none;
+.wtbp-update-message-changelog p:before, .wtbp-update-message-changelog ~ p:before {
+    content: none !important;
 }
 
 .wtbp-update-message-changelog {

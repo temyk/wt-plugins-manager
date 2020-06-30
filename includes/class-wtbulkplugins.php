@@ -96,12 +96,14 @@ class WTBulkPlugins {
 
 		if ( get_option( WTBP_PLUGIN_PREFIX . 'update_changelog', true ) ) {
 			$updates = get_site_transient( 'update_plugins' );
-			foreach ( $updates->response as $update ) {
-				if ( $update ) {
-					add_action( "in_plugin_update_message-{$update->plugin}", [
-						$this,
-						'changelog_in_update_message'
-					], 10, 2 );
+			if ( $updates && is_object( $updates ) ) {
+				foreach ( $updates->response as $update ) {
+					if ( $update ) {
+						add_action( "in_plugin_update_message-{$update->plugin}", [
+							$this,
+							'changelog_in_update_message'
+						], 10, 2 );
+					}
 				}
 			}
 		}
@@ -423,7 +425,7 @@ class WTBulkPlugins {
 	public function changelog_in_update_message( $plugin_data, $response ) {
 		require_once ABSPATH . "wp-admin/includes/plugin-install.php";
 		$cache_option_name = WTBP_PLUGIN_PREFIX . $plugin_data['slug'] . '_' . $plugin_data['new_version'];
-		$readme = get_transient( $cache_option_name );
+		$readme            = get_transient( $cache_option_name );
 
 		if ( ! $readme ) {
 			$api = plugins_api(

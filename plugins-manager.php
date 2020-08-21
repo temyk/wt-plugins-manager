@@ -1,8 +1,8 @@
 <?php
 /**
- * Plugin Name:       Plugins Manager
+ * Plugin Name:       WP Plugins Page Customize
  * Description:       This plugin allows you to bulk deactivate and immediately remove other plugins
- * Version:           1.2.6
+ * Version:           1.3.0
  * Author:            Webtemyk
  * Author URI:        temyk.ru
  * License:           GPL-2.0+
@@ -20,7 +20,7 @@ if ( ! defined( 'WPINC' ) ) {
  * Start at version 1.0.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define( 'WTBP_VERSION', '1.2.5' );
+define( 'WTBP_VERSION', '1.3.0' );
 define( 'WTBP_PLUGIN_FILE', __FILE__ );
 define( 'WTBP_ABSPATH', dirname( __FILE__ ) );
 define( 'WTBP_PLUGIN_BASENAME', plugin_basename( __FILE__ ));

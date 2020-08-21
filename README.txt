@@ -1,24 +1,24 @@
-=== WP Plugins Manager ===
+=== WP Plugins Page Customize ===
 Contributors: webtemyk
-Tags: plugins, bulk, manager, developer,
+Tags: plugins, customize, plugins page, wp plugins, git
 Requires at least: 4.6
-Tested up to: 5.4.0
+Tested up to: 5.5
 Stable tag: trunk
 Requires PHP: 5.6.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Plugins Manager plugin adds the ability to deactivate and immediately delete plugins by clicking on a single link.
-It also adds features to the plugin page, such as icons and GIT status.
+WP Plugins Page Customize plugins page and adds the ability to deactivate and immediately delete plugins by clicking on a single link.
 
 == Description ==
 
-An additional "Deactivate and remove" link appears in the list of plugins. When you click on it, the plugin is deactivated and immediately deleted.
-The plugin list also displays logos and icons if the plugin is loaded via GIT.
-You can also sort plugins: the active first or the inactive first.
-The update notification for these plug-ins is reduced so as not to distract attention from updating other plug-ins.
-Displays a changelog in the plugin update notice.
-
+= It is customizes the plugins page: =
+* Adds a plugin icon
+* Displays the changelog in the update notification
+* The plugin list also displays logos and icons if the plugin is loaded via GIT. The update notification for these plug-ins is reduced so as not to distract attention from updating other plug-ins.
+* Adds sorting of plugins on the fly: Active first/Not active at first
+* In Wordpress 5.5+ changes the Auto-update column to small neat checkboxes
+* The "Delete" plugin link is now active for activated plugins. It allows you to immediately deactivate and delete the plugin.
 
 == Installation ==
 
@@ -34,6 +34,10 @@ Deleted plugins cannot be restored. However, most plugins do not remove their se
 1. All plugin improvements are marked with a red line
 
 == Changelog ==
+
+= 1.3.0 =
+* Rename the plugin from "Plugins Manager" to "WP Plugins Page Customize"
+* In Wordpress 5.5+ changes the Auto-update column to small neat checkboxes
 
 = 1.2.6 =
 * Add settings page

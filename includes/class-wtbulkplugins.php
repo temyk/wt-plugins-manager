@@ -94,9 +94,11 @@ class WTBulkPlugins {
 		add_filter( 'plugin_row_meta', [ $this, 'add_update_icons' ], 99999, 4 );
 		add_filter( 'site_transient_update_plugins', [ $this, 'disable_plugin_updates_if_git' ], 10, 2 );
 
+		add_filter( 'plugin_auto_update_setting_html', [ $this, 'plugin_auto_update_html' ], 10, 3 );
+
 		if ( get_option( WTBP_PLUGIN_PREFIX . 'update_changelog', true ) ) {
 			$updates = get_site_transient( 'update_plugins' );
-			if ( $updates && is_object( $updates ) ) {
+			if ( $updates && is_object( $updates ) && isset( $updates->response ) ) {
 				foreach ( $updates->response as $update ) {
 					if ( $update ) {
 						add_action( "in_plugin_update_message-{$update->plugin}", [
@@ -436,13 +438,55 @@ class WTBulkPlugins {
 			);
 			if ( ! is_wp_error( $api ) ) {
 				$readme = explode( '<h4>', $api->sections['changelog'] );
-				$readme = '<h4>' . $readme[1];
+				$readme = count( $readme ) > 1 ? '<h4>' . $readme[1] : $readme[0];
 
 				set_transient( $cache_option_name, $readme, DAY_IN_SECONDS );
 			}
 		}
-
 		echo "<div class='wtbp-update-message-changelog' style='display: block;'>{$readme}</div>";
+	}
+
+
+	/**
+	 * @param $html
+	 * @param $plugin_file
+	 * @param $plugin_data
+	 */
+	public function plugin_auto_update_html( $html, $plugin_file, $plugin_data ) {
+		$auto_updates = (array) get_site_option( 'auto_update_plugins', array() );
+		$checked      = '';
+		if ( in_array( $plugin_file, $auto_updates, true ) ) {
+			$text    = __( 'Disable auto-updates' );
+			$action  = 'disable';
+			$checked = 'checked';
+		} else {
+			$text    = __( 'Enable auto-updates' );
+			$action  = 'enable';
+			$checked = '';
+		}
+
+		global $status, $page, $s, $totals;
+		$query_args = array(
+			'action'        => "{$action}-auto-update",
+			'plugin'        => $plugin_file,
+			'paged'         => $page,
+			'plugin_status' => $status,
+		);
+
+		$url = add_query_arg( $query_args, 'plugins.php' );
+
+		$result[] = sprintf(
+			'<div style="text-align: right;"><a href="%s" class="toggle-auto-update aria-button-if-js" data-wp-action="%s">',
+			wp_nonce_url( $url, 'updates' ),
+			$action
+		);
+
+		$result[] = '<span class="dashicons dashicons-update spin hidden" aria-hidden="true"></span>';
+		$result[] = '</a>';
+		$result[] = "<input type='checkbox' title='{$text}' class='wtb_autoupdate_checkbox' {$checked}></div>";
+		$result   = implode( '', $result );
+
+		return $result;
 	}
 
 #endregion Plugin Functions

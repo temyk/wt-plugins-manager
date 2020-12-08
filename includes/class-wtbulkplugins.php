@@ -161,7 +161,7 @@ class WTBulkPlugins {
 	 * @return mixed
 	 */
 	public function disable_plugin_updates_if_git( $value, $transient ) {
-		if ( is_object( $value ) && isset( $value->response ) && is_countable( $value->response ) ) {
+		if ( is_object( $value ) && isset( $value->response ) ) {
 			foreach ( $value->response as $key => $item ) {
 				if ( $this->is_plugin_git( $key ) ) {
 					$value->no_update[ $key ] = $item;

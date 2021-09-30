@@ -1,4 +1,6 @@
 jQuery(document).ready(function ($) {
+    //jQuery('.plugin-update.colspanchange').attr('colspan', 4);
+
     var tbl = jQuery('table.wp-list-table.plugins tbody tr');
     var btn_text = jQuery('.wtbp_sort_plugins').text();
 
@@ -25,8 +27,17 @@ jQuery(document).ready(function ($) {
     });
 
     jQuery(document).on('click', '#wtbp-delete-confirm', function (e) {
-        if (!confirm(wtbp_confirm_text)) {
+        if (!confirm(wtbp_confirm.text)) {
             e.preventDefault();
         }
+    });
+    //Auto-update
+    jQuery(document).on('change', '.wtb_autoupdate_checkbox', function (e) {
+        var self = jQuery(this);
+        self.hide();
+        self.prev('.toggle-auto-update').click();
+        jQuery(document).on('wp-auto-update-setting-changed', function (event, data) {
+            self.show();
+        });
     });
 });

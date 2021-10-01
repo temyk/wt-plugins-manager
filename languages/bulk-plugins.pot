@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Bulk Plugin Manager\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-28 06:13+0000\n"
+"POT-Creation-Date: 2021-09-30 12:17+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: \n"
@@ -15,36 +15,81 @@ msgstr ""
 "X-Generator: Loco https://localise.biz/\n"
 "X-Loco-Version: 2.3.1; wp-5.3"
 
-#: includes/class-wtbulkplugins.php:127
+#: admin/includes/class-plugin-page-customizer.php:198
 msgid "Are you sure you want to deactivate and remove the plugin?"
 msgstr ""
 
-#: includes/class-wtbulkplugins.php:188
-msgid "Settings updated"
+#: admin/pages/class.page-settings.php:54
+msgid "Check and show GIT"
 msgstr ""
 
-#: includes/class-wtbulkplugins.php:199
-msgid "Delete"
-msgstr ""
-
-#: includes/class-wtbulkplugins.php:224
-msgid "You do not have enough permissions to remove or deactivate plugins"
-msgstr ""
-
-#: includes/class-wtbulkplugins.php:241
-msgid "Plugins deactivated and delete: "
-msgstr ""
-
-#: includes/class-wtbulkplugins.php:253
+#: admin/includes/class-plugin-page-customizer.php:229
 msgid "Deactivate and delete"
 msgstr ""
 
-#: includes/class-wtbulkplugins.php:268
+#: admin/includes/class-plugin-page-customizer.php:288
+msgid "Delete"
+msgstr ""
+
+#: admin/class.page-base-settings.php:93
+msgid "Enable"
+msgstr ""
+
+#: admin/pages/class.page-settings.php:39
+msgid "General settings"
+msgstr ""
+
+#: admin/includes/class-plugin-page-customizer.php:303
 msgid "Image"
 msgstr ""
 
+#: admin/includes/class-plugin-page-customizer.php:275
+msgid "Plugins deactivated and delete: "
+msgstr ""
+
 #. Name of the plugin
-msgid "Plugins Manager"
+msgid "Plugins Page Customize"
+msgstr ""
+
+#: admin/pages/class.page-settings.php:23
+msgid "Plugins Page Customizer"
+msgstr ""
+
+#: admin/pages/class.page-settings.php:64
+msgid "Replace autoupdate text to checkboxes"
+msgstr ""
+
+#: admin/pages/class.page-settings.php:22
+msgid "Settings of Plugins Page Customizer"
+msgstr ""
+
+#: admin/includes/class-plugin-page-customizer.php:214
+msgid "Settings updated"
+msgstr ""
+
+#: admin/pages/class.page-settings.php:49
+msgid "Show changelog in update notice"
+msgstr ""
+
+#: admin/pages/class.page-settings.php:59
+msgid "Show GIT branch"
+msgstr ""
+
+#: admin/pages/class.page-settings.php:44
+msgid "Show plugins icons column"
+msgstr ""
+
+#: admin/includes/class-plugin-page-customizer.php:344
+msgid "Sort plugins"
+msgstr ""
+
+#. Author URI of the plugin
+msgid "temyk.ru"
+msgstr ""
+
+#: plugins-manager.php:44
+#, php-format
+msgid "The %s plugin has stopped. <b>Error:</b> %s Code: %s"
 msgstr ""
 
 #. Description of the plugin
@@ -53,11 +98,20 @@ msgid ""
 "plugins"
 msgstr ""
 
+#: admin/includes/class-plugin-page-customizer.php:153
+#: admin/includes/class-plugin-page-customizer.php:154
+msgid "This plugin is installed as a GIT repository!"
+msgstr ""
+
+#: includes/base/class.plugin-base.php:214
+msgid "This template does not exist!"
+msgstr ""
+
 #. Author of the plugin
 msgid "Webtemyk"
 msgstr ""
 
-#. URI of the plugin
-#. Author URI of the plugin
-msgid "temyk.ru"
+#: admin/includes/class-plugin-page-customizer.php:255
+#: admin/includes/class-plugin-page-customizer.php:383
+msgid "You do not have enough permissions to remove or deactivate plugins"
 msgstr ""

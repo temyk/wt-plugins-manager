@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Plugins Page Customize
  * Description:       This plugin allows you to bulk deactivate and immediately remove other plugins
- * Version:           1.4.0
+ * Version:           1.4.1
  * Author:            Webtemyk
  * Author URI:        temyk.ru
  * License:           GPL-2.0+
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Currently plugin version.
  * Rename this for your plugin and update it as you release new versions.
  */
-define( 'WTBP_VERSION', '1.4.0' );
+define( 'WTBP_VERSION', '1.4.1' );
 define( 'WTBP_PLUGIN_FILE', __FILE__ );
 define( 'WTBP_ABSPATH', dirname( __FILE__ ) );
 define( 'WTBP_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
@@ -38,7 +38,9 @@ if ( is_admin() ) {
 }
 
 try {
-	new \WTBP\Plugin();
+	if ( is_admin() ) {
+		new \WTBP\Plugin();
+	}
 } catch ( Exception $e ) {
 	$mpn_plugin_error_func = function () use ( $e ) {
 		$error = sprintf( __( "The %s plugin has stopped. <b>Error:</b> %s Code: %s", 'bulk-plugins' ), 'My Plugin Name', $e->getMessage(), $e->getCode() );

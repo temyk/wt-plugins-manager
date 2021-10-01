@@ -1,4 +1,4 @@
-=== WP Plugins Page Customize ===
+=== Plugins Page Customize ===
 Contributors: webtemyk
 Tags: plugins, customize, plugins page, wp plugins, git
 Requires at least: 4.6
@@ -36,6 +36,9 @@ Deleted plugins cannot be restored. However, most plugins do not remove their se
 3.v Plugin Settings page
 
 == Changelog ==
+
+= 1.4.1 =
+* Fix: Error on frontend
 
 = 1.4.0 =
 * The plugin is rewritten using a [WT Plugin Template](https://github.com/temyk/wt-plugin-template)

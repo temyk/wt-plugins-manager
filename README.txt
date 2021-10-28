@@ -32,10 +32,13 @@ Deleted plugins cannot be restored. However, most plugins do not remove their se
 == Screenshots ==
 
 1. All plugin improvements are marked with a red line
-2. Plugins that are not in the Wordpress repository are marked with icons with the first letter of the plugin name to make it easier to search for plugins in the list.
+2. Plugins that are not in the WordPress repository are marked with icons with the first letter of the plugin name to make it easier to search for plugins in the list.
 3.v Plugin Settings page
 
 == Changelog ==
+
+= 1.4.2 =
+* Add: Multisite support
 
 = 1.4.1 =
 * Fix: Error on frontend

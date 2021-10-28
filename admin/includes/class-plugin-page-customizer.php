@@ -48,19 +48,26 @@ class PluginPageCustomizer {
 		//ADD DEACTIVATE AND DELETE
 		add_action( 'admin_notices', [ $this, 'bulk_action_admin_notice' ] );
 		add_filter( 'bulk_actions-plugins', [ $this, 'register_bulk_action' ] );
+		add_filter( 'bulk_actions-plugins-network', [ $this, 'register_bulk_action' ] );
+
 		add_filter( 'handle_bulk_actions-plugins', [ $this, 'bulk_action_handler' ], 10, 3 );
+		add_filter( 'handle_bulk_actions-plugins-network', [ $this, 'bulk_action_handler' ], 10, 3 );
+
 		add_filter( 'plugin_action_links', [ $this, 'add_action_links' ], 10, 4 );
 		add_action( 'current_screen', [ $this, 'plugin_screen_actions' ] );
 
 		//ADD IMAGE COLUMN
 		if ( $this->plugin->getOption( 'show_icons_column', 1 ) ) {
 			add_filter( "manage_plugins_columns", [ $this, 'add_plugins_column' ], 10, 1 );
+			add_filter( "manage_plugins-network_columns", [ $this, 'add_plugins_column' ], 10, 1 );
 			add_action( 'manage_plugins_custom_column', [ $this, 'manage_plugins_column' ], 10, 3 );
 		}
 
 		//SORT
 		add_action( 'manage_plugins_sortable_columns', [ $this, 'manage_plugins_sortable' ], 10, 1 );
+		add_action( 'manage_plugins-network_sortable_columns', [ $this, 'manage_plugins_sortable' ], 10, 1 );
 		add_filter( 'views_plugins', [ $this, 'add_filter_link' ], 10, 1 );
+		add_filter( 'views_plugins-network', [ $this, 'add_filter_link' ], 10, 1 );
 
 		//GIT
 		if ( $this->plugin->getOption( 'show_git', 1 ) ) {
@@ -373,7 +380,7 @@ class PluginPageCustomizer {
 	 *
 	 */
 	public function plugin_screen_actions( $screen ) {
-		if ( 'plugins' == $screen->id ) {
+		if ( 'plugins' == $screen->id || 'plugins-network' == $screen->id ) {
 			if ( isset( $_GET['action'] ) && isset( $_GET['plugin'] ) && $_GET['action'] === 'deactivate_and_delete' ) {
 				$pluginName = explode( '/', $_GET['plugin'] )[0] ?? '';
 				$deleted    = $this->deactivate_and_delete( urldecode( $_GET['plugin'] ) );

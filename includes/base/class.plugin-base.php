@@ -54,7 +54,7 @@ abstract class Plugin_Base {
 			$this->version = '1.0.0';
 		}
 		$this->plugin_name = WTBP_PLUGIN_SLUG;
-		
+
 		add_action( 'wp_enqueue_scripts', [ $this, 'front_enqueue_assets' ] );
 		add_action( 'admin_enqueue_scripts', [ $this, 'admin_enqueue_assets' ] );
 
@@ -135,7 +135,7 @@ abstract class Plugin_Base {
 	 */
 	public function register_page( $class_name ) {
 		if ( ! class_exists( $class_name ) ) {
-			$class_name = __NAMESPACE__ . "\\" . $class_name;
+			$class_name = __NAMESPACE__ . '\\' . $class_name;
 			if ( ! class_exists( $class_name ) ) {
 				throw new Exception( 'A class with this name {' . $class_name . '} does not exist.' );
 			}

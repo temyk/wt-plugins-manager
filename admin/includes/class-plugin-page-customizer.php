@@ -18,7 +18,7 @@ class PluginPageCustomizer {
 	 * @var Plugin
 	 */
 	public $plugin;
-#region Basic functions
+	#region Basic functions
 
 	/**
 	 * Define the core functionality of the plugin.
@@ -58,8 +58,8 @@ class PluginPageCustomizer {
 
 		//ADD IMAGE COLUMN
 		if ( $this->plugin->getOption( 'show_icons_column', 1 ) ) {
-			add_filter( "manage_plugins_columns", [ $this, 'add_plugins_column' ], 10, 1 );
-			add_filter( "manage_plugins-network_columns", [ $this, 'add_plugins_column' ], 10, 1 );
+			add_filter( 'manage_plugins_columns', [ $this, 'add_plugins_column' ], 10, 1 );
+			add_filter( 'manage_plugins-network_columns', [ $this, 'add_plugins_column' ], 10, 1 );
 			add_action( 'manage_plugins_custom_column', [ $this, 'manage_plugins_column' ], 10, 3 );
 		}
 
@@ -161,7 +161,8 @@ class PluginPageCustomizer {
                         <span class='wtbp-git-icon' title='" . __( 'This plugin is installed as a GIT repository!', 'bulk-plugins' ) . "'></span>";
 
 			if ( $this->plugin->getOption( 'show_git_branch', 0 ) ) {
-				$branch  = $this->get_plugin_git_branch( $plugin_file );
+				$branch = $this->get_plugin_git_branch( $plugin_file );
+
 				$meta[0] .= "<span class='wtbp-git-version-branch' title='{$branch}'>({$branch})</span>";
 			}
 		}
@@ -199,8 +200,8 @@ class PluginPageCustomizer {
 	 */
 	public function admin_enqueue_scripts( $screen ) {
 		if ( 'plugins.php' === $screen ) {
-			wp_enqueue_style( WTBP_PLUGIN_PREFIX . 'admin-basic-style', WTBP_PLUGIN_URL . '/admin/assets/css/wtbp-admin.css', [] );
-			wp_enqueue_script( WTBP_PLUGIN_PREFIX . 'admin-basic-script', WTBP_PLUGIN_URL . '/admin/assets/js/wtbp-admin.js', [] );
+			wp_enqueue_style( WTBP_PLUGIN_PREFIX . 'admin-basic-style', WTBP_PLUGIN_URL . '/admin/assets/css/wtbp-admin.css', [], WTBP_VERSION );
+			wp_enqueue_script( WTBP_PLUGIN_PREFIX . 'admin-basic-script', WTBP_PLUGIN_URL . '/admin/assets/js/wtbp-admin.js', [ 'jquery' ], WTBP_VERSION, false );
 			wp_localize_script( WTBP_PLUGIN_PREFIX . 'admin-basic-script', 'wtbp_confirm', [
 				'text' => __( 'Are you sure you want to deactivate and remove the plugin?', 'bulk-plugins' ),
 			] );
@@ -208,12 +209,11 @@ class PluginPageCustomizer {
 
 	}
 
-#endregion Basic functions
+	#endregion Basic functions
 
-#region Plugin Functions
+	#region Plugin Functions
 	/**
 	 * Settings page
-	 *
 	 */
 	public function show_settings() {
 		if ( isset( $_POST['wtbp_update_changelog'] ) && check_admin_referer( 'wtbp_save_settings' ) ) {
@@ -224,7 +224,7 @@ class PluginPageCustomizer {
 		$options = [
 			'update_changelog' => get_option( WTBP_PLUGIN_PREFIX . 'update_changelog', 1 ),
 		];
-		require_once WTBP_PLUGIN_PATH . "admin/settings.php";
+		require_once WTBP_PLUGIN_PATH . 'admin/settings.php';
 	}
 
 	/**
@@ -269,7 +269,6 @@ class PluginPageCustomizer {
 
 	/**
 	 * Admin notice after bulk action
-	 *
 	 */
 	public function bulk_action_admin_notice() {
 		if ( empty( $_GET['wtbp_bulk_action'] ) ) {
@@ -279,19 +278,18 @@ class PluginPageCustomizer {
 		$_SERVER['REQUEST_URI'] = remove_query_arg( [ 'wtbp_bulk_action' ], $_SERVER['REQUEST_URI'] );
 
 		$data = htmlspecialchars( strip_tags( $_GET['wtbp_bulk_action'] ) );
-		$msg  = "<b>" . __( 'Plugins deactivated and delete: ', 'bulk-plugins' ) . "</b>" . $data;
+		$msg  = '<b>' . __( 'Plugins deactivated and delete: ', 'bulk-plugins' ) . '</b>' . $data;
 		echo '<div id="message" class="updated"><p>' . $msg . '</p></div>';
 	}
 
 	/**
 	 * Admin notice after bulk action
-	 *
 	 */
 	public function add_action_links( $actions, $plugin_file, $plugin_data, $context ) {
 		if ( is_plugin_active( $plugin_file ) ) {
 			$actions[] = '<a href="' . add_query_arg( [
 					'action' => 'deactivate_and_delete',
-					'plugin' => urlencode( $plugin_file ),
+					'plugin' => rawurlencode( $plugin_file ),
 				] ) . '" id="wtbp-delete-confirm">' . __( 'Delete', 'bulk-plugins' ) . '</a>';
 		}
 
@@ -314,7 +312,6 @@ class PluginPageCustomizer {
 
 	/**
 	 * Manage Image column in plugins page
-	 *
 	 */
 	public function manage_plugins_column( $column_name, $plugin_file, $plugin_data ) {
 		if ( 'image' == $column_name ) {
@@ -333,7 +330,6 @@ class PluginPageCustomizer {
 
 	/**
 	 * Add sortable column
-	 *
 	 */
 	public function manage_plugins_sortable( $sortable_columns ) {
 		$sortable_columns['name'] = [ 'Name', false ];
@@ -345,7 +341,6 @@ class PluginPageCustomizer {
 
 	/**
 	 * Add filter on the Posts list tables.
-	 *
 	 */
 	public function add_filter_link( $views ) {
 		$views['plugins_filter'] = '<a href="#" class="wtbp_sort_plugins" data-sort="active">' . __( 'Sort plugins', 'bulk-plugins' ) . '</a>';
@@ -377,7 +372,6 @@ class PluginPageCustomizer {
 
 	/**
 	 * Hook action on plugins.php screen
-	 *
 	 */
 	public function plugin_screen_actions( $screen ) {
 		if ( 'plugins' == $screen->id || 'plugins-network' == $screen->id ) {
@@ -394,13 +388,14 @@ class PluginPageCustomizer {
 	}
 
 	/**
-	 *
 	 * @param $plugin_data
 	 * @param $response
+	 *
+	 * @return void
 	 */
 	public function changelog_in_update_message( $plugin_data, $response ) {
-		require_once ABSPATH . "wp-admin/includes/plugin-install.php";
-		$cache_option_name = WTBP_PLUGIN_PREFIX . $plugin_data['slug'] . '_' . $plugin_data['new_version'];
+		require_once ABSPATH . 'wp-admin/includes/plugin-install.php';
+		$cache_option_name = WTBP_PLUGIN_PREFIX . "_{$plugin_data['slug']}_{$plugin_data['new_version']}";
 		$readme            = get_transient( $cache_option_name );
 
 		if ( ! $readme ) {
@@ -408,9 +403,11 @@ class PluginPageCustomizer {
 				'slug' => wp_unslash( $plugin_data['slug'] ),
 			] );
 			if ( ! is_wp_error( $api ) ) {
-				$readme = explode( '<h4>', $api->sections['changelog'] );
-				$readme = count( $readme ) > 1 ? '<h4>' . $readme[1] : $readme[0];
-
+				$matches = [];
+				preg_match_all( '/^(<h1>|<h2>|<h3>|<h4>|<p>|<div>)' . $plugin_data['Version'] . '.*(<\/h1>|<\/h2>|<\/h3>|<\/h4>|<\/p>|<\/div>)$/m', $api->sections['changelog'], $matches );
+				if ( isset( $matches[0][0] ) ) {
+					$readme = substr( $api->sections['changelog'], 0, strpos( $api->sections['changelog'], $matches[0][0] ) );
+				}
 				set_transient( $cache_option_name, $readme, DAY_IN_SECONDS );
 			}
 		}
@@ -456,5 +453,5 @@ class PluginPageCustomizer {
 		return $result;
 	}
 
-#endregion Plugin Functions
+	#endregion Plugin Functions
 }

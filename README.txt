@@ -1,8 +1,8 @@
 === Plugins Page Customize ===
 Contributors: webtemyk
 Tags: plugins, customize, plugins page, wp plugins, git
-Requires at least: 4.6
-Tested up to: 5.8
+Requires at least: 5.0
+Tested up to: 6.1
 Stable tag: trunk
 Requires PHP: 7.0
 License: GPLv2 or later
@@ -36,6 +36,12 @@ Deleted plugins cannot be restored. However, most plugins do not remove their se
 3.v Plugin Settings page
 
 == Changelog ==
+
+= 1.4.4 =
+* Fix: Shows error, when plugin icon is empty
+
+= 1.4.3 =
+* Fix: The plugins changelog was displayed in full, instead of displaying only the latest version
 
 = 1.4.2 =
 * Add: Multisite support

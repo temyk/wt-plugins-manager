@@ -314,8 +314,8 @@ class PluginPageCustomizer {
 	 * Manage Image column in plugins page
 	 */
 	public function manage_plugins_column( $column_name, $plugin_file, $plugin_data ) {
-		if ( 'image' == $column_name ) {
-			if ( isset( $plugin_data['icons'] ) ) {
+		if ( 'image' === $column_name ) {
+			if ( isset( $plugin_data['icons'] ) && ! empty( $plugin_data['icons'] ) ) {
 				$icon = $plugin_data['icons']['1x'] ?? $plugin_data['icons']['default'];
 			}
 

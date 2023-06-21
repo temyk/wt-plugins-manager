@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Plugins Page Customize
  * Description:       This plugin customizes plugins page and allows you to bulk deactivate and immediately remove other plugins
- * Version:           1.4.3
+ * Version:           1.4.4
  * Author:            Webtemyk
  * Author URI:        temyk.ru
  * License:           GPL-2.0+
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Currently plugin version.
  * Rename this for your plugin and update it as you release new versions.
  */
-define( 'WTBP_VERSION', '1.4.3' );
+define( 'WTBP_VERSION', '1.4.4' );
 define( 'WTBP_PLUGIN_FILE', __FILE__ );
 define( 'WTBP_ABSPATH', dirname( __FILE__ ) );
 define( 'WTBP_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
